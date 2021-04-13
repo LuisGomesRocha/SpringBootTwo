@@ -43,7 +43,7 @@ Na listagem é importante trabalharmos com dados paginados. Descreva em detalhes
 
 
 ### Carregar a dependência no pom.xml:
-<p align="justify"> : Outra dependência que deveríamos colocar é de qual a ferramenta, o provedor de cache que quero utilizar para aplicação. Com a aplicação rodando em produção, o ideal é utilizar algum provedor de cache. O Spring suporte alguns provedores, mas para fins de desenvolvimento, não precisamos usar nenhum provedor. Se não declararmos um provedor, o Spring usa um padrão, que é onde ele guarda o cache em memória usando um REST map. Mas esse provider não é recomendado para usar em produção. :robot: </p>
+<p align="justify"> ⛹️‍♂️ Outra dependência que deveríamos colocar é de qual a ferramenta, o provedor de cache que quero utilizar para aplicação. Com a aplicação rodando em produção, o ideal é utilizar algum provedor de cache. O Spring suporte alguns provedores, mas para fins de desenvolvimento, não precisamos usar nenhum provedor. Se não declararmos um provedor, o Spring usa um padrão, que é onde ele guarda o cache em memória usando um REST map. Mas esse provider não é recomendado para usar em produção. ⛹️‍♂️ </p>
 
 ```
 <dependency>
@@ -68,7 +68,7 @@ public class SpringBootTwoApplication {
 ```
 ### No CadastroController selecionamos o método que vai receber o cache:
 
-<p align="justify"> : Vou colocar na classe buscarTudo presente no CadastroController a anotação @Cacheable, para indicar ao Spring guardar o retorno desse método em cache. Essa anotação tem um atributo que precisamos preencher chamad value, que temos que passar uma string responsável para identificadar esse cache. Na nossa aplicação, é possivel ter vários métodos anotados com @Cacheable, e o Spring precisa saber como ele vai diferenciar um do outro. :robot: </p>
+<p align="justify"> ⛹️‍♂️  Vou colocar na classe buscarTudo presente no CadastroController a anotação @Cacheable, para indicar ao Spring guardar o retorno desse método em cache. Essa anotação tem um atributo que precisamos preencher chamad value, que temos que passar uma string responsável para identificadar esse cache. Na nossa aplicação, é possivel ter vários métodos anotados com @Cacheable, e o Spring precisa saber como ele vai diferenciar um do outro. :robot: </p>
 
 ```
 
@@ -83,9 +83,41 @@ public class SpringBootTwoApplication {
 	
 ```
 
-<p align="justify"> :robot: Na listagem é importante trabalharmos com dados paginados. Descreva em detalhes os passos de implementação que você faria para possibilitar que a aplicação cliente pudesse acessar as informações de paginada e porque realizar a paginação é importante. :robot: </p>
-
+<p align="justify"> ⛹️‍♂️  Na listagem é importante trabalharmos com dados paginados. Descreva em detalhes os passos de implementação que você faria para possibilitar que a aplicação cliente pudesse acessar as informações de paginada e porque realizar a paginação é importante. :robot: </p>
 
 - [x] Na listagem é importante trabalharmos com dados paginados e porque realizar a paginação é importante.
+
+<p align="justify"> ⛹️‍♂️  A paginação pode ser utilizada quando é feita uma requisição de consulta. Serve para filtrar a quantidade de registros que você quer buscar melhorando a eficiência da aplicação. Exemplo, se você estiver realizando uma consulta em uma base de dados muito grande, além dos filtros da sua query, você também pode restringir a quantidade de registros que deseja retornar em um intervalo de páginas reduzindo o tempo de espera e o "peso" da requisição. :robot: </p>
+
+<p align="justify"> ⛹️‍♂️ No método que vamos selecionar para implementar a paginação (tipo GET), teremos os parâmetros "passados" pelo Postman através da url, diferente do método POST, que tem um parâmetro, mas está com @RequestBody, ou seja, o parâmetro vem no corpo da requisição, no formato JSON, no método lista esses parâmetros não vêm no corpo da requisição. Eles vêm na própria url, como parâmetros de url. :robot: </p>
+	
+	
+
+	
+	[02:18] 
+
+[02:47] No geral, para esse tipo de parâmetro é interessante colocar uma anotação, que é o @RequestParam, para avisar ao Spring que é um parâmetro de request. Automaticamente, quando você coloca essa anotação, o Spring considera que o parâmetro é obrigatório. Se chamarmos esse endereço e não passarmos o parâmetro, o Spring vai jogar um erro 400 para o cliente dizendo que tem um parâmetro obrigatório que ele não enviou.
+Só que no caso, o nome do curso vai ser opcional. Então, nessa anotação tem um atributo chamado required, que vai ser igual a falso.
+
+Já o int página e int quantidade também vou colocar o request param, para avisar para o Spring que são parâmetros de url, mas vou colocar como obrigatórios. Quero obrigar o cliente que está chamando a API a sempre passar os parâmetros de página e quantidade, para sempre termos a paginação.
+
+[03:48] Nosso método agora tem três parâmetros, o nome do curso, a página e a quantidade. Na consulta não mudamos nada na implementação. Os parâmetros vão chegar, mas ele vai ignorar. Como faço para pegar esses parâmetros e na hora de chamar o repository, chamar o findall, ou o findbycurso, quero fazer a paginação.
+
+	
+	
+
+
+
+
+
+@GetMapping
+	@Cacheable(value = "buscarTudo")
+	public ResponseEntity<Page<Cadastro>> buscarTudo(@RequestParam int pagina, @RequestParam int qtd) {
+		Pageable cadastro = (Pageable) PageRequest.of(pagina, qtd);
+		return ResponseEntity.status(HttpStatus.OK).body(cadastroService.buscarTudo(cadastro));
+
+}
+
+
 
 

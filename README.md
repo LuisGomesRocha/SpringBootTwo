@@ -171,7 +171,7 @@ public interface CadastroRepository extends JpaRepository<Cadastro, Long> {
 
 ```
 
-<p align="justify"> ⛹️‍♂️ Por fim necessitamos configurar nosso CadastroService para receber um page "Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);", alterando assim o retorno do método, que agora não vai ser mais um list, vai ser um page.
+<p align="justify"> ⛹️‍♂️ Por fim necessitamos configurar nosso CadastroService para receber um page "Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);" alterando assim o retorno do método, que agora não vai ser mais um list, vai ser um page. ⛹️‍♂️ </p> 
 	
 ### No CadastroService:
 
@@ -182,6 +182,20 @@ public Page<Cadastro> buscarTudo(Pageable cadastro) {
 }
 ```
 
+<p align="justify"> 👮 Para fechar, descreva como funciona o mecanismo de autenticação e autorização para uma API Rest através de tokens 👮</p> 
 
+- [x] Autorização para uma API Rest através de tokens.
 
+<p align="justify"> 👮 Inicialmente será adicionado ao pom.xml duas dependência: starter-security, que é o módulo de segurança do Spring Boot e a jsonwebtoken JWT (JSON Web Token) método RCT 7519 padrão da indústria para realizar autenticação entre duas partes por meio de um token assinado que autentica uma requisição web. 👮 </p> 
 
+```
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+	<groupId>io.jsonwebtoken</groupId>
+	<artifactId>jjwt</artifactId>
+	<version>0.9.0</version>
+</dependency>
+```

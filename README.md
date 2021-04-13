@@ -74,8 +74,8 @@ public class SpringBootTwoApplication {
 @GetMapping
 @Cacheable(value = "buscarTudo")
 	public ResponseEntity<Page<Cadastro>> buscarTudo(@RequestParam int pagina, @RequestParam int qtd) {
-		Pageable cadastro = (Pageable) PageRequest.of(pagina, qtd);
-		return ResponseEntity.status(HttpStatus.OK).body(cadastroService.buscarTudo(cadastro));
+	Pageable cadastro = (Pageable) PageRequest.of(pagina, qtd);
+	return ResponseEntity.status(HttpStatus.OK).body(cadastroService.buscarTudo(cadastro));
 
 }
 	

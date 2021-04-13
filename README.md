@@ -89,34 +89,102 @@ public class SpringBootTwoApplication {
 
 <p align="justify"> ⛹️‍♂️  A paginação pode ser utilizada quando é feita uma requisição de consulta. Serve para filtrar a quantidade de registros que você quer buscar melhorando a eficiência da aplicação. Exemplo, se você estiver realizando uma consulta em uma base de dados muito grande, além dos filtros da sua query, você também pode restringir a quantidade de registros que deseja retornar em um intervalo de páginas reduzindo o tempo de espera e o "peso" da requisição. :robot: </p>
 
-<p align="justify"> ⛹️‍♂️ No método que vamos selecionar para implementar a paginação (tipo GET), teremos os parâmetros "passados" pelo Postman através da url, diferente do método POST, que tem um parâmetro, mas está com @RequestBody, ou seja, o parâmetro vem no corpo da requisição, no formato JSON, no método lista esses parâmetros não vêm no corpo da requisição. Eles vêm na própria url, como parâmetros de url. :robot: </p>
-	
-	
+<p align="justify"> ⛹️‍♂️ No método que vamos selecionar para implementar a paginação (tipo GET), teremos os parâmetros "passados" pelo Postman através da url, diferente do método POST, que tem um parâmetro, mas está com @RequestBody, ou seja, o parâmetro vem no corpo da requisição, no formato JSON, no método lista esses parâmetros não vêm no corpo da requisição. :robot: </p>
+
+```
+http://localhost:8080/api/cadastro/listar?pagina=0&qtd=0
+
+```
+
+<p align="justify"> ⛹️‍♂️ No geral, para esse tipo de parâmetro é interessante colocar uma anotação, que é o @RequestParam, para avisar ao Spring que é um parâmetro de request. Automaticamente, quando você coloca essa anotação, o Spring considera que o parâmetro é obrigatório. Se chamarmos esse endereço e não passarmos o parâmetro, o Spring vai jogar um erro 400 para o cliente dizendo que tem um parâmetro obrigatório que ele não enviou.Desta forma as variáveis página e quantidade serão obrigatórios, obrigando o cliente da API a sempre passar esses parâmetros, para sempre termos a paginação. :robot: </p>
 
 	
-	[02:18] 
+<p align="justify"> ⛹️‍♂️ Para fazer paginação, precisamos criar uma variável do tipo pageable, que é uma classe do Spring data que serve justamente para fazer paginação. Para criar essa interface pageable, é preciso importar a org.springframework.data. No  CadastroController utilizamos um método estático chamado of, em que passamos a página e a quantidade. Com isso, ele cria um objeto do tipo pageable. :robot: </p>
 
-[02:47] No geral, para esse tipo de parâmetro é interessante colocar uma anotação, que é o @RequestParam, para avisar ao Spring que é um parâmetro de request. Automaticamente, quando você coloca essa anotação, o Spring considera que o parâmetro é obrigatório. Se chamarmos esse endereço e não passarmos o parâmetro, o Spring vai jogar um erro 400 para o cliente dizendo que tem um parâmetro obrigatório que ele não enviou.
-Só que no caso, o nome do curso vai ser opcional. Então, nessa anotação tem um atributo chamado required, que vai ser igual a falso.
+### No CadastroController no método buscarTudo:
 
-Já o int página e int quantidade também vou colocar o request param, para avisar para o Spring que são parâmetros de url, mas vou colocar como obrigatórios. Quero obrigar o cliente que está chamando a API a sempre passar os parâmetros de página e quantidade, para sempre termos a paginação.
-
-[03:48] Nosso método agora tem três parâmetros, o nome do curso, a página e a quantidade. Na consulta não mudamos nada na implementação. Os parâmetros vão chegar, mas ele vai ignorar. Como faço para pegar esses parâmetros e na hora de chamar o repository, chamar o findall, ou o findbycurso, quero fazer a paginação.
-
-	
-	
-
-
-
-
-
+```
 @GetMapping
 	@Cacheable(value = "buscarTudo")
 	public ResponseEntity<Page<Cadastro>> buscarTudo(@RequestParam int pagina, @RequestParam int qtd) {
 		Pageable cadastro = (Pageable) PageRequest.of(pagina, qtd);
 		return ResponseEntity.status(HttpStatus.OK).body(cadastroService.buscarTudo(cadastro));
+}
+```
+
+<p align="justify"> ⛹️‍♂️ Por sua vez dentro do CadastroRepository verificamos a existencia de vários findall (devido a extenção da classe JpaRepository para o  CadastroRepository), dentre eles têm um que recebe um pageable como parâmetro. Então, podemos passar esse paginação como parâmetro para o método, que o Spring data automaticamente vai saber que você quer fazer paginação e vai usar os parâmetros página e quantidade para saber qual o primeiro registro e quantos registros ele vai carregar.:robot: </p> 
+	
+### No CadastroRepository:
+```
+CadastroRepository
+@Repository
+public interface CadastroRepository extends JpaRepository<Cadastro, Long> {
+
+	Optional<Cadastro> findByEmail(String email);
+	Page<Cadastro> findAll(Pageable pageable);
 
 }
+```
+
+<p align="justify"> ⛹️‍♂️ Quando usamos paginação, o retorno do método findall não é mais um list, e sim outra classe chamada page, contendo a lista com os registros,  informações do número de páginas, qual a página atual, quantos elementos tem no total. :robot: </p> 
+
+```	
+	{
+    "content": [
+        {
+            "id": 1,
+            "nome": "Aluno",
+            "email": "aluno@email.com",
+            "idade": 22,
+            "enabled": true,
+            "username": "aluno@email.com",
+            "credentialsNonExpired": true,
+            "accountNonExpired": true,
+            "authorities": [],
+            "accountNonLocked": true
+        }
+    ],
+    "pageable": {
+        "sort": {
+            "sorted": false,
+            "unsorted": true,
+            "empty": true
+        },
+        "offset": 0,
+        "pageNumber": 0,
+        "pageSize": 1,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": false,
+    "totalElements": 7,
+    "totalPages": 7,
+    "number": 0,
+    "size": 1,
+    "sort": {
+        "sorted": false,
+        "unsorted": true,
+        "empty": true
+    },
+    "first": true,
+    "numberOfElements": 1,
+    "empty": false
+}
+
+```
+
+<p align="justify"> ⛹️‍♂️ Por fim necessitamos configurar nosso CadastroService para receber um page "Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);", alterando assim o retorno do método, que agora não vai ser mais um list, vai ser um page.
+	
+### No CadastroService:
+
+```
+	public Page<Cadastro> buscarTudo(Pageable cadastro) {
+		
+		Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);
+		return paginaCadastro;		
+		
+	}
+```
 
 
 

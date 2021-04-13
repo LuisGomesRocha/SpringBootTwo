@@ -71,15 +71,13 @@ public class SpringBootTwoApplication {
 <p align="justify"> ⛹️‍♂️  Vou colocar na classe buscarTudo presente no CadastroController a anotação @Cacheable, para indicar ao Spring guardar o retorno desse método em cache. Essa anotação tem um atributo que precisamos preencher chamad value, que temos que passar uma string responsável para identificadar esse cache. Na nossa aplicação, é possivel ter vários métodos anotados com @Cacheable, e o Spring precisa saber como ele vai diferenciar um do outro. :robot: </p>
 
 ```
-
-	@GetMapping
-	@Cacheable(value = "buscarTudo")
+@GetMapping
+@Cacheable(value = "buscarTudo")
 	public ResponseEntity<Page<Cadastro>> buscarTudo(@RequestParam int pagina, @RequestParam int qtd) {
 		Pageable cadastro = (Pageable) PageRequest.of(pagina, qtd);
 		return ResponseEntity.status(HttpStatus.OK).body(cadastroService.buscarTudo(cadastro));
 
-	}
-	
+}
 	
 ```
 
@@ -129,19 +127,19 @@ public interface CadastroRepository extends JpaRepository<Cadastro, Long> {
 <p align="justify"> ⛹️‍♂️ Quando usamos paginação, o retorno do método findall não é mais um list, e sim outra classe chamada page, contendo a lista com os registros,  informações do número de páginas, qual a página atual, quantos elementos tem no total. :robot: </p> 
 
 ```	
-	{
-    "content": [
-        {
-            "id": 1,
-            "nome": "Aluno",
-            "email": "aluno@email.com",
-            "idade": 22,
-            "enabled": true,
-            "username": "aluno@email.com",
-            "credentialsNonExpired": true,
-            "accountNonExpired": true,
-            "authorities": [],
-            "accountNonLocked": true
+{
+  "content": [
+       {
+          "id": 1,
+          "nome": "Aluno",
+          "email": "aluno@email.com",
+          "idade": 22,
+          "enabled": true,
+          "username": "aluno@email.com",
+          "credentialsNonExpired": true,          
+	  "accountNonExpired": true,
+          "authorities": [],
+          "accountNonLocked": true
         }
     ],
     "pageable": {
@@ -178,12 +176,10 @@ public interface CadastroRepository extends JpaRepository<Cadastro, Long> {
 ### No CadastroService:
 
 ```
-	public Page<Cadastro> buscarTudo(Pageable cadastro) {
-		
-		Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);
-		return paginaCadastro;		
-		
-	}
+public Page<Cadastro> buscarTudo(Pageable cadastro) {
+	Page<Cadastro> paginaCadastro = cadastroRepository.findAll(cadastro);
+	return paginaCadastro;	
+}
 ```
 
 

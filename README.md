@@ -21,20 +21,25 @@ Para fechar, descreva como funciona o mecanismo de autenticação e autorizaçã
 	🚧  🚀 Spring Boot...  🚧
 </h4>
 
-### Features
+### Features 
+<h2 align="center"> Primeiro desafio: <a href=" https://github.com/LuisGomesRocha/SpringBootOne">🔗 SpringBootOne</a> </h2>
 
-- [x] Cadastrar novos(as) alunos(as) (Vimos no <a href=" https://github.com/LuisGomesRocha/SpringBootOne">🔗 SpringBootOne</a>)
-- [x] O nome do aluno não pode ter mais de 30 caracteres
-- [x] O email do aluno pode ter no máximo 30 caracteres
-- [x] Idade dos alunos precisa ser maior ou igual a 18 anos
-- [x] Retornar um status 200 para a aplicação cliente em caso de sucesso ou 400 em caso de falha de validação
-- [x] Detalhes de cada aluno(a) possam ser acessados
-- [x] Identificação do(a) aluno(a) será feita pelo id do banco de dados e deve fazer parte do endereço de acesso
-- [x] Para o detalhe, só precisamos exibir o nome e o email
+- [x] Cadastrar novos(as) alunos(as) (Vimos no SpringBootOne)
+- [x] O nome do aluno não pode ter mais de 30 caracteres (Vimos no SpringBootOne)
+- [x] O email do aluno pode ter no máximo 30 caracteres (Vimos no SpringBootOne)
+- [x] Idade dos alunos precisa ser maior ou igual a 18 anos (Vimos no SpringBootOne)
+- [x] Retornar um status 200 para a aplicação cliente em caso de sucesso ou 400 em caso de falha de validação (Vimos no SpringBootOne)
+- [x] Detalhes de cada aluno(a) possam ser acessados (Vimos no SpringBootOne)
+- [x] Identificação do(a) aluno(a) será feita pelo id do banco de dados e deve fazer parte do endereço de acesso (Vimos no SpringBootOne)
+- [x] Para o detalhe, só precisamos exibir o nome e o email (Vimos no SpringBootOne)
 
-evitar que a recuperação dessa informação fosse feita sempre a partir do banco de dados?
-Na listagem é importante trabalharmos com dados paginados e porque realizar a paginação é importante.
-autorização para uma API Rest através de tokens. 
+
+- [ok] Evitar que a recuperação dessa informação fosse feita sempre a partir do banco de dados?
+- [ok] Na listagem é importante trabalharmos com dados paginados e porque realizar a paginação é importante.
+- [ok] Autorização para uma API Rest através de tokens.
+
+
+ 
 
 
 <p align="justify"> :robot: Usando o que foi visto durante o curso,  descreva todos os passos que você faria desde conseguir tratar a requisição feita para determinado endereço até retornar as informações do(a) aluno(a) em formato JSON.  :robot: </p>

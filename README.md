@@ -202,11 +202,8 @@ public Page<Cadastro> buscarTudo(Pageable cadastro) {
 
 ### AutenticacaoService
 
-<p align="justify"> 👮 Com a criação da classe SecurityConfigurations, implementamos a anotação @EnableWebSecurity junto com a extensão do método WebSecurityConfigurerAdapter que juntos fornecem o principio básico da segurança web da API, sendo capaz em apenas algumas linhas de código exigir que o usuário seja autenticado antes de acessar qualquer URL em nosso aplicativo, criar um usuário com o nome de usuário e senha, ativa a autenticação HTTP básica e baseada em formulário Spring Security redenrizado automaticamente (uma página de login e uma página de logout), login-processing-url só será processado para HTTP POST e a página de login só será processada para HTTP GET.👮 </p> 
-
-<p align="justify"> 👮 Através da anotação @Configuration é indicado ao spring que determinada classe possui métodos que expõe novos beans, sendo ela no caso implementada na  SecurityConfigurations através do configure(HttpSecurity http), permitindo acesso livre ao método listar (.antMatchers(HttpMethod.GET, "/api/cadastro/listar").permitAll()), h2-console (.antMatchers(HttpMethod.GET, "/h2-console/*").permitAll()) e auth (.antMatchers(HttpMethod.POST, "/auth").permitAll()).👮 </p> 
+<p align="justify"> 👮 Inicialmente vamos criar a estrutura para armazenamento de senhas implementada no UserDetailsService, que vai fornecer métodos para consultar os usuários na base de dados, retonando no caso negativo "Dados inválidos". 👮 </p> 
 	
-
 ```
 @Service
 public class AutenticacaoService implements UserDetailsService {
@@ -223,51 +220,6 @@ public class AutenticacaoService implements UserDetailsService {
 		
 		throw new UsernameNotFoundException("Dados inválidos!");
 	}
-}
-```
-
-AutenticacaoViaTokenFilter
-
-```
-public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
-	
-	private TokenService tokenService;
-	private CadastroRepository repository;
-
-	public AutenticacaoViaTokenFilter(TokenService tokenService, CadastroRepository repository) {
-		this.tokenService = tokenService;
-		this.repository = repository;
-	}
-
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		
-		String token = recuperarToken(request);
-		boolean valido = tokenService.isTokenValido(token);
-		if (valido) {
-			autenticarCliente(token);
-		}
-		
-		filterChain.doFilter(request, response);
-	}
-
-	private void autenticarCliente(String token) {
-		Long idUsuario = tokenService.getIdUsuario(token);
-		Cadastro cadastro = repository.findById(idUsuario).get();
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(cadastro, null, cadastro.getAuthorities());
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-	}
-
-	private String recuperarToken(HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {
-			return null;
-		}
-		
-		return token.substring(7, token.length());
-	}
-
 }
 ```
 
@@ -325,7 +277,56 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 }
 ```
 
-TokenService
+### AutenticacaoViaTokenFilter
+
+<p align="justify"> 👮 agora no AutenticacaoViaTokenFilter vamos extender OncePerRequestFilter para AutenticacaoViaTokenFilter para garantir que as solicitações seja executada apenas uma vez por solicitação fornecendo doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) com método os argumentos HttpServletRequest e HttpServletResponse. As subclasses podem decidir se devem ser chamadas uma vez por solicitação ou uma vez por thread de solicitação, enquanto a mesma solicitação estiver sendo processada. 👮 </p> 
+
+```
+public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
+	
+	private TokenService tokenService;
+	private CadastroRepository repository;
+
+	public AutenticacaoViaTokenFilter(TokenService tokenService, CadastroRepository repository) {
+		this.tokenService = tokenService;
+		this.repository = repository;
+	}
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		
+		String token = recuperarToken(request);
+		boolean valido = tokenService.isTokenValido(token);
+		if (valido) {
+			autenticarCliente(token);
+		}
+		
+		filterChain.doFilter(request, response);
+	}
+
+	private void autenticarCliente(String token) {
+		Long idUsuario = tokenService.getIdUsuario(token);
+		Cadastro cadastro = repository.findById(idUsuario).get();
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(cadastro, null, cadastro.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
+
+	private String recuperarToken(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {
+			return null;
+		}
+		
+		return token.substring(7, token.length());
+	}
+
+}
+```
+
+### TokenService
+
+<p align="justify"> 👮 Por fim a classe TokenService é utilizada apenas para a geração/validação de tokens, bem como a demimitação do prazo de expiração da seção autenticada. 	👮 </p>
 
 ```
 @Service
@@ -367,24 +368,3 @@ public class TokenService {
 
 }
 ```
-
-
-
-
-
-	só para colocarmos coisas relacionadas a segurança dentro desse pacote. E vou criar uma classe chamada, por exemplo, securityConfigurations. A ideia é que dentro dessa classe estarão todas as configurações de segurança do nosso projeto. 
-	
-	. Vou criar uma nova classe, colocar no pacote security, 
-
-	
-	
-	👮</p> 
-
-
-[02:43] É uma classe Java, não tem nada a ver com Spring. Tenho que habilitar a parte do Spring security. Para fazer isso, fazemos na própria classe. Existe uma anotação chamada @EnableWebSecurity. Como essa é uma classe que tem configurações, precisamos colocar a anotação @Configuration. O Spring vai carregar e ler as configurações que estiverem dentro dessa classe.
-
-[03:20] Além disso, vamos ter que herdar essa classe de outra classe do Spring chamada web security configurer adapter. Essa classe tem alguns métodos para fazer as configurações que vamos sobrescrever posteriormente.
-
-[03:38] É isso. Nós colocamos a dependência do Spring security no projeto, criamos a classe, anotada com @EnableWebSecurity, com @Configuration. Dentro, depois, vamos colocar as configurações de segurança. Por enquanto está vazio, mas só de ter feiro isso já habilitamos a parte de segurança. Por padrão, o Spring bloqueia todo acesso à nossa API. Tudo está restrito até que eu faça a configuração e libere o que precisa ser liberado.
-
-[04:05] Já podemos testar. No Postman, vou tentar disparar uma requisição para aquele nosso endpoint/tópicos, que era o endpoint que trazia uma lista com todos os tópicos do projeto. Ele não voltou a lista. Devolveu o código 401. Não tenho autorização. Ou seja, o Spring security está habilitado e o padrão dele é bloquear tudo. Com isso, terminamos nessa aula. No próximo vídeo vamos começar a fazer as configurações, para ensinar ao Spring o que é público e o que não é.

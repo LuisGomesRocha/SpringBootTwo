@@ -1,0 +1,46 @@
+Spring Boot API Rest: Segurança da API, Cache e Monitoramento
+
+
+
+Cenário:
+
+Já temos muitos alunos e alunas cadastradas e agora temos muito acesso para visualizar os perfis. Além disso, temos um novo endpoint de listagem e essa lista só cresce. Para fechar, é mais do que importante a gente controlar o acesso a tais informações.
+
+
+Dado que as informações cadastradas dos alunos e alunas quase nunca muda, o que você faria para evitar que a recuperação dessa informação fosse feita sempre a partir do banco de dados?
+Na listagem é importante trabalharmos com dados paginados. Descreva em detalhes os passos de implementação que você faria para possibilitar que a aplicação cliente pudesse acessar as informações de paginada e porque realizar a paginação é importante.
+Para fechar, descreva como funciona o mecanismo de autenticação e autorização para uma API Rest através de tokens.
+
+
+O que seria bom ver nessa resposta?
+
+
+
+Peso 3: Utilização do Spring Cache para aumentar a velocidade de acesso às informações de detalhe dos(as) alunos(as).
+Peso 2: Detalhes que precisam aparecer para o uso da paginação
+Peso 1: O motivo de utilizar a paginação
+Peso 0.25: Método novo acessado via GET para listagem
+Peso 0.25: Parâmetro do tipo Pageable no método
+Peso 0.25: Criação de um método no repository já recebendo um Pageable como argumento e retornando um tipo que representa Paginaçao.
+Peso 0.25: Retorno do objeto do tipo que representa uma Paginaçao conectado com um outro objeto de saída, para controlar as informações certinhas.
+Peso 5: Na resposta sobre segurança é importante ver uma referência a utilização do token e também sobre o funcionamento do token.
+Peso 2.5: Explicação da utilização do token associada ao fato de não querermos manter estado no lado do servidor.
+Peso 2.5: Explicação sobre o conteúdo do token, informando que a informação ali é criptografada e que contém tudo que é necessário para verificar a existência do usuário na aplicação a cada nova requisição.
+
+
+Resposta do Especialista:
+
+Para não acessar o banco de dados o tempo todo para visualizar os detalhes dos(as) alunos(as), eu posso configurar o cache dentro do projeto, através do Spring Cache. Minha estratégia seria começar anotando o método do controller de detalhe com a annotation de Cache. Um ponto de atenção seria a configuração de timeout dos dados em função da necessidade de negócio.
+Para a paginação:
+Paginamos os dados porque é importante controlar o número de informações retornados nos endpoints. Se a gente não controla, a performance pode ser afetada assim como a própria visualização dos dados.
+Primeiro eu crio o método de listagem conectado com um endereço de acesso via GET
+Defino um argumento do tipo Pageable para este método
+Crio um método no Repository(crio o Repository caso não exista) que recebe como argumento o objeto do tipo Pageable
+Transformo os objetos retornados pelo método do Repository para objetos de um tipo de saída para a listagem.
+Retorno o objeto que representa a paginação a partir do método do controller.
+Para fazer um sistema de autenticação e autorização numa API Rest é necessário fazer com que a informação que representa o "usuário logado" seja passada em cada requisição feita do cliente para o servidor. Chamamos essa informação de "token". Isso pode ser feito via cookie, header, parâmetro de requisição etc.  Isto é feito por conta da natureza stateless da API, a ideia é que toda informação venha sempre do cliente. Isso facilita qualquer ação relativa a escalabilidade futura.
+
+Este token geralmente contém algumas informações do usuário criptografadas a partir de uma chave. Podemos colocar timeout também nesse token para controlar tempo de acesso. A especificação sugerida para guiar a criação do token é a JWT. O Spring Security suporta tudo isso através de configurações um tanto quanto extensas.
+
+
+
